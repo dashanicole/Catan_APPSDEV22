@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Remoting.Lifetime;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.SqlServer.Server;
@@ -14,8 +15,7 @@ namespace Parking_System
         private string plateNum, vehicleBrand, selectedVType, vType;
         private string[] vehicleType = { "Motorbike", "SUV", "Van", "Sedan" };
         private string dtIn = Convert.ToString(DateTime.Now), dtOut = Convert.ToString(DateTime.Now);
-        private int parkTime;
-        private double flagDown, addPerHr, amount;
+        private double parkTime, flagDown, addPerHr, amount;
 
         // Setters and getters
         public string PlateNum { get { return plateNum; } set { plateNum = value; } }
@@ -24,7 +24,7 @@ namespace Parking_System
         public string VType { get { return vType; } set { vType = value; } }
         public string DtIn { get { return dtIn; } set { dtIn = value; } }
         public string DtOut { get { return dtOut; } set { dtOut = value; } }
-        public int ParkTime { get { return parkTime; } set { parkTime = value; } }
+        public double ParkTime { get { return parkTime; } set { parkTime = value; } }
         public double FlagDown { get { return flagDown; } set { flagDown = value; } }
         public double AddPerHr { get { return addPerHr; } set { addPerHr = value; } }
 
@@ -85,9 +85,9 @@ namespace Parking_System
                 Console.Write("\nEnter the Vehicle Brand: ");
                 vBrnd = Console.ReadLine();
 
-                if (invalidInputStr(vBrnd)) { Console.Write("\nInvalid input! Please enter again..."); }
+                if (vBrnd.Length == 0) { Console.Write("\nInvalid input! Please enter again..."); }
 
-            } while (invalidInputStr(vBrnd)); // let the user enter again if invalid
+            } while (vBrnd.Length == 0); // let the user enter again if invalid
 
             return vBrnd;
         }
@@ -95,11 +95,13 @@ namespace Parking_System
         // displayParkIn method
         public void displayParkIn() // display park-in info
         {
+            string dtin = Convert.ToDateTime(dtIn).ToString("MM/dd/yyyy HH:mm");
+
             Console.WriteLine("\n--- PARK IN INFO ---");
-            Console.WriteLine("Plate No.: " + plateNum);
-            Console.WriteLine("Type: " + selectedVType);
-            Console.WriteLine("Brand: " + vehicleBrand);
-            Console.WriteLine("Park In (Date/Time): " + dtIn);
+            Console.WriteLine($"Plate No.: {plateNum}");
+            Console.WriteLine($"Type: {selectedVType}");
+            Console.WriteLine($"Brand: {vehicleBrand}");
+            Console.WriteLine($"Park In (Date/Time): {dtin}");
         }
 
         // Motorbike class inherited the Vehicle class
@@ -150,58 +152,37 @@ namespace Parking_System
         }
 
         // askTimeParkOut method
-        public DateTime askTimeParkOut()
+        public string askTimeParkOut()
         {
             string time;
 
             do
             {
                 // Asking user for the park-out time
-                Console.Write("\nEnter the Time Park Out (24-Hour Format): ");
+                Console.Write("\nEnter the Date/Time Park Out (MM/dd/yyyy HH/mm): ");
                 time = Console.ReadLine();
 
-                if (invalidInputTime(time)) { Console.Write("\nInvalid input! Please enter again..."); }
+                if (invalidInputTime(time, dtIn)) { Console.Write("\nInvalid input! Please enter again..."); }
 
-            } while (invalidInputTime(time)); // let the user enter again if invalid
+            } while (invalidInputTime(time, dtIn)); // let the user enter again if invalid
 
-            return Convert.ToDateTime(time);
+            return time;
         }
 
         // calculateParkTime method
-        public int calculateParkTime()
+        public double calculateParkTime()
         {
-            // Calculation for the park time
-            int timeInHr = Convert.ToInt32(Convert.ToDateTime(dtIn).ToString("HH:mm").Substring(0, 2));
-            int timeInMin = Convert.ToInt32(Convert.ToDateTime(dtIn).ToString("HH:mm").Substring(3));
-            int timeOutHr = Convert.ToInt32(Convert.ToDateTime(dtOut).ToString("HH:mm").Substring(0, 2));
-            int timeOutMin = Convert.ToInt32(Convert.ToDateTime(dtOut).ToString("HH:mm").Substring(3));
+            string dtin = Convert.ToDateTime(dtIn).ToString("MM/dd/yyyy HH:mm");
 
-            if (timeInMin > timeOutMin)
-            {
-                if (timeInHr > timeOutHr || timeInHr == timeOutHr)
-                {
-                    int count = 0;
-                    for (; timeInHr != 24; timeInHr++) { count++; }
-                    return count + timeOutHr;
-                }
-                else
-                {
-                    return timeOutHr-- - timeInHr;
-                }
-            }
-            else
-            {
-                if (timeInHr > timeOutHr || timeInHr == timeOutHr)
-                {
-                    int count = 0;
-                    for (; timeInHr != 24; timeInHr++) { count++; }
-                    return count + timeOutHr;
-                }
-                else
-                {
-                    return timeOutHr - timeInHr;
-                }
-            }
+            // Parse strings to DateTime objects
+            DateTime startDateTime = DateTime.ParseExact(dtin, "MM/dd/yyyy HH:mm", null);
+            DateTime endDateTime = DateTime.ParseExact(dtOut, "MM/dd/yyyy HH:mm", null);
+
+            // Calculate duration between start and end
+            TimeSpan duration = endDateTime - startDateTime;
+
+            // Extract total hours
+            return duration.TotalHours;
         }
 
         // totalAmount method
@@ -214,16 +195,18 @@ namespace Parking_System
         // displayParkOut method
         public void displayParkOut() // display the park-out info
         {
+            string dtin = Convert.ToDateTime(dtIn).ToString("MM/dd/yyyy HH:mm");
+
             Console.WriteLine("\n--- PARK OUT INFO ---");
-            Console.WriteLine("Date/Time In: " + dtIn);
-            Console.WriteLine("         Out: " + dtOut);
-            if (parkTime > 1) { Console.WriteLine("Parking Time: " + parkTime + " hrs"); }
-            else { Console.WriteLine("Parking Time: " + parkTime + " hr"); }
-            Console.WriteLine("Amount: " + amount);
+            Console.WriteLine($"Date/Time In: {dtin}");
+            Console.WriteLine($"         Out: {dtOut}");
+            if (parkTime > 1) { Console.WriteLine($"Parking Time: {Math.Round(parkTime)} hrs"); }
+            else { Console.WriteLine($"Parking Time: {Math.Round(parkTime)} hr"); }
+            Console.WriteLine($"Amount: PHP{String.Format("{0:0.00}", amount)}");
         }
 
         // invalidInputStr method
-        static bool invalidInputStr(String input)
+        static bool invalidInputStr(string input)
         {
             bool invalidInput = false;
 
@@ -243,7 +226,7 @@ namespace Parking_System
         }
 
         // invalidInputSlct method
-        static bool invalidInputSlct(String input)
+        static bool invalidInputSlct(string input)
         {
             bool invalidInput = false;
 
@@ -257,7 +240,7 @@ namespace Parking_System
         }
 
         // invalidInputChs method
-        public bool invalidInputChs(String input)
+        public bool invalidInputChs(string input)
         {
             bool invalidInput = false;
 
@@ -271,40 +254,87 @@ namespace Parking_System
         }
 
         // invalidInputTime method
-        static bool invalidInputTime(String input)
+        static bool invalidInputTime(string input, string dtIN)
         { 
             bool invalidInput = false;
 
             // To check if the input is valid or not
-            if (invalidInputStr(input)) { invalidInput = true; }
-            else if (input.Length > 5 || input.Length < 4) { invalidInput = true; }
-            else if (input.Length == 5) 
+            if (input.Length != 16) { invalidInput = true; }
+            else
             {
-                if (!Char.IsDigit(input[0]) || !Char.IsDigit(input[1]) || input[2] != ':' 
-                    || !Char.IsDigit(input[3]) || !Char.IsDigit(input[4])) 
+                // For Date
+                if (!Char.IsDigit(input[0]) || !Char.IsDigit(input[1]) || input[2] != '/' || !Char.IsDigit(input[3])
+                    || !Char.IsDigit(input[4]) || input[5] != '/' || !Char.IsDigit(input[6]) || !Char.IsDigit(input[7])
+                    || !Char.IsDigit(input[8]) || !Char.IsDigit(input[9]) || input[10] != ' ')
+                {
+                    invalidInput = true; 
+                }
+                // Year Limit
+                else if (Convert.ToInt32(Convert.ToDateTime(dtIN).ToString("yyyy")) > Convert.ToInt32(input.Substring(6, 4)))
+                {
+                    invalidInput = true; 
+                }
+                // Month Limit
+                else if (0 > Convert.ToInt32(input.Substring(0, 2)) || Convert.ToInt32(input.Substring(0, 2)) > 12
+                    || ((Convert.ToInt32(Convert.ToDateTime(dtIN).ToString("MM")) > Convert.ToInt32(input.Substring(0, 2))
+                    && Convert.ToInt32(Convert.ToDateTime(dtIN).ToString("yyyy")) == Convert.ToInt32(input.Substring(6, 4)))))
                 {
                     invalidInput = true;
                 }
-                else if (0 > Convert.ToInt32(input.Substring(0, 2)) || Convert.ToInt32(input.Substring(0,2)) > 23 
-                    || 0 > Convert.ToInt32(input.Substring(3)) || Convert.ToInt32(input.Substring(3)) > 59) 
+                // Day Limit
+                // February (leap year)
+                else if (Convert.ToInt32(input.Substring(0, 2)) == 2 && (Convert.ToInt32(input.Substring(6, 4)) % 400 == 0
+                    || (Convert.ToInt32(input.Substring(6, 4)) % 100 != 0 && Convert.ToInt32(input.Substring(6, 4)) % 4 == 0))
+                    && (0 > Convert.ToInt32(input.Substring(3, 2)) || Convert.ToInt32(input.Substring(3, 2)) > 29))
                 {
                     invalidInput = true;
                 }
-            }
-            else if (input.Length == 4) 
-            {
-                if (!Char.IsDigit(input[0]) || input[1] != ':' || !Char.IsDigit(input[2]) 
-                    || !Char.IsDigit(input[3]))
+                // February 
+                else if (Convert.ToInt32(input.Substring(0, 2)) == 2 && (0 > Convert.ToInt32(input.Substring(3, 2))
+                    || Convert.ToInt32(input.Substring(3, 2)) > 28))
                 {
-                    invalidInput = true;
+                    invalidInput = true; 
                 }
-                else if (0 > Convert.ToInt32(input.Substring(0, 1)) || Convert.ToInt32(input.Substring(0, 1)) > 9
-                    || 0 > Convert.ToInt32(input.Substring(2)) || Convert.ToInt32(input.Substring(2)) > 59)
+                // April, June, September, November
+                else if ((Convert.ToInt32(input.Substring(0, 2)) == 4 || Convert.ToInt32(input.Substring(0, 2)) == 6
+                    || Convert.ToInt32(input.Substring(0, 2)) == 9 || Convert.ToInt32(input.Substring(0, 2)) == 11)
+                    && (0 > Convert.ToInt32(input.Substring(3, 2)) || Convert.ToInt32(input.Substring(3, 2)) > 30))
                 {
-                    invalidInput = true;
+                    invalidInput = true; 
                 }
-            }
+                // January, March, May, July, August, October, December
+                else if ((Convert.ToInt32(input.Substring(0, 2)) == 1 || Convert.ToInt32(input.Substring(0, 2)) == 3
+                    || Convert.ToInt32(input.Substring(0, 2)) == 5 || Convert.ToInt32(input.Substring(0, 2)) == 7
+                    || Convert.ToInt32(input.Substring(0, 2)) == 8 || Convert.ToInt32(input.Substring(0, 2)) == 10
+                    || Convert.ToInt32(input.Substring(0, 2)) == 12) && (0 > Convert.ToInt32(input.Substring(3, 2))
+                    || Convert.ToInt32(input.Substring(3, 2)) > 31))
+                {
+                    invalidInput = true; 
+                }
+                else if (Convert.ToInt32(Convert.ToDateTime(dtIN).ToString("dd")) > Convert.ToInt32(input.Substring(3, 2))
+                    && Convert.ToInt32(Convert.ToDateTime(dtIN).ToString("MM")) > Convert.ToInt32(input.Substring(0, 2)))
+                {
+                    invalidInput = true; 
+                }
 
+                // For Time
+                else if (!Char.IsDigit(input[11]) || !Char.IsDigit(input[12]) || input[13] != ':'
+                    || !Char.IsDigit(input[14]) || !Char.IsDigit(input[15]))
+                {
+                    invalidInput = true; 
+                }
+                // Hour Limit
+                else if ((0 > Convert.ToInt32(input.Substring(11, 2)) || Convert.ToInt32(input.Substring(11, 2)) > 23))
+                {
+                    invalidInput = true; 
+                }
+                // Minute Limit
+                else if ((0 > Convert.ToInt32(input.Substring(14)) || Convert.ToInt32(input.Substring(14)) > 59))
+                {
+                    invalidInput = true; 
+                }
+            }
+   
             return invalidInput;
         }
     }
