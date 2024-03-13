@@ -1,7 +1,0 @@
-C:\Users\ACER\OneDrive\Desktop\CC-APPSDEV22\C#\Parking System\Parking System\obj\Debug\Parking System.csproj.AssemblyReference.cache
-C:\Users\ACER\OneDrive\Desktop\CC-APPSDEV22\C#\Parking System\Parking System\obj\Debug\Parking System.csproj.CoreCompileInputs.cache
-C:\Users\ACER\OneDrive\Desktop\CC-APPSDEV22\C#\Parking System\Parking System\bin\Debug\Parking System.exe.config
-C:\Users\ACER\OneDrive\Desktop\CC-APPSDEV22\C#\Parking System\Parking System\bin\Debug\Parking System.exe
-C:\Users\ACER\OneDrive\Desktop\CC-APPSDEV22\C#\Parking System\Parking System\bin\Debug\Parking System.pdb
-C:\Users\ACER\OneDrive\Desktop\CC-APPSDEV22\C#\Parking System\Parking System\obj\Debug\Parking System.exe
-C:\Users\ACER\OneDrive\Desktop\CC-APPSDEV22\C#\Parking System\Parking System\obj\Debug\Parking System.pdb
