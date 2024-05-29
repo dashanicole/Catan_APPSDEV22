@@ -22,7 +22,6 @@ namespace ParkingSystemDesign.view
         {
             string user = textUsername.Text, pass = textPassword.Text;
             DateTime now = DateTime.Now;
-            string dateTime = now.ToString("MM/dd/yyyy HH:mm");
 
             try
             {
@@ -53,7 +52,7 @@ namespace ParkingSystemDesign.view
                 else
                 {
                     MessageBox.Show("Login Successfully!", "Login", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    DatabaseManager.addUsrLog(dateTime);
+                    DatabaseManager.addUsrLog(now);
                     new Form1().Show();
                     this.Hide();
                 }

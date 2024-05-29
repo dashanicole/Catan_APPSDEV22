@@ -14,7 +14,7 @@ SELECT * FROM Users
 CREATE TABLE UserLogs (
     logId INT PRIMARY KEY IDENTITY(200, 1),
     userId INT,
-    logDate NVARCHAR(MAX),
+    logDate DATETIME,
     FOREIGN KEY (userId) REFERENCES Users(userId)
 );
 

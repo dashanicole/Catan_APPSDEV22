@@ -136,7 +136,7 @@ namespace ParkingSystemDesign.controller
             return status;
         }
 
-        public static void addUsrLog(string dateTime)
+        public static void addUsrLog(DateTime dt)
         {
             try
             {
@@ -146,7 +146,7 @@ namespace ParkingSystemDesign.controller
                                      "VALUES (@userId, @logDate); SELECT SCOPE_IDENTITY();", con);
 
                 cmd.Parameters.AddWithValue("@userId", userId);
-                cmd.Parameters.AddWithValue("@logDate", dateTime);
+                cmd.Parameters.AddWithValue("@logDate", dt);
 
                 // Execute the command and capture the new userId
                 object result = cmd.ExecuteScalar();
