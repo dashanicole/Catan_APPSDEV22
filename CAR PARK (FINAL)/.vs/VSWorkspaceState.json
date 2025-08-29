@@ -1,7 +1,16 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\ParkingSystemDesign",
+    "\\ParkingSystemDesign\\bin",
+    "\\ParkingSystemDesign\\controller",
+    "\\ParkingSystemDesign\\model",
+    "\\ParkingSystemDesign\\obj",
+    "\\ParkingSystemDesign\\obj\\Debug",
+    "\\ParkingSystemDesign\\obj\\Release",
+    "\\ParkingSystemDesign\\Properties",
+    "\\ParkingSystemDesign\\view"
   ],
-  "SelectedNode": "\\ParkingSystemDesign.sln",
+  "SelectedNode": "\\ParkingSystemDesign\\controller\\DatabaseManager.cs",
   "PreviewInSolutionExplorer": false
 }

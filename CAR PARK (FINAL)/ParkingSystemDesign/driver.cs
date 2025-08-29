@@ -19,7 +19,7 @@ namespace ParkingSystemDesign
         {
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
-            DatabaseManager.initDB("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False");
+            DatabaseManager.initDB("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=ParkSys;Integrated Security=True;");
             ApplicationConfiguration.Initialize();
             Application.Run(new FormLogin());
         }
